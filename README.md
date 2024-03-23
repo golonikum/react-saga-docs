@@ -7,7 +7,7 @@ import { take, fork, ... } from 'redux-saga/effects'
 function* watchRequests() {
   while (true) {
     const {payload} = yield take('REQUEST')
-    yield fork(handleRequest, payload)
+    yield fork(handleRequest, payload)  // non-blocking call
   }
 }
 
@@ -21,7 +21,7 @@ import { take, call, ... } from 'redux-saga/effects'
 function* watchRequests() {
   while (true) {
     const {payload} = yield take('REQUEST')
-    yield call(handleRequest, payload)
+    yield call(handleRequest, payload)  // blocking call
   }
 }
 
@@ -38,7 +38,7 @@ function* watchRequests() {
     const {payload} = yield take('REQUEST')
 
     if (task) {
-      yield cancel(task)
+      yield cancel(task)  // cancel current task
     }
 
     task = yield fork(handleRequest, payload)
@@ -53,13 +53,10 @@ function* handleRequest(payload) { ... }
 import { take, actionChannel, call, ... } from 'redux-saga/effects'
 
 function* watchRequests() {
-  // 1- Create a channel for request actions
-  const requestChannel = yield actionChannel('REQUEST')
+  const requestChannel = yield actionChannel('REQUEST')  // 1- Create a channel for request actions
   while (true) {
-    // 2- take from the channel
-    const {payload} = yield take(requestChannel)
-    // 3- Note that we're using a blocking call
-    yield call(handleRequest, payload)
+    const {payload} = yield take(requestChannel)  // 2- take from the channel
+    yield call(handleRequest, payload)  // 3- Note that we're using a blocking call
   }
 }
 
